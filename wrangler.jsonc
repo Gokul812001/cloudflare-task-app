@@ -14,13 +14,13 @@
 		{
 			"binding": "DB", // <--- name used in code: env.DB
 			"database_name": "tasks_db",
-			"database_id": "021593c4-ec70-482d-b34d-2bd587d39e50"
+			"database_id": "0a2d90db-e600-4001-8441-7dcfb63675c9"
 		}
 	],
 	"kv_namespaces": [
  		 {
   			  "binding": "KV",
-  			  "id": "d6b891fa878440a7a1ce66567ad77d82",
+  			  "id": "4b7794fc42ee4e0db6e29b04967bbc8b",
   			  
  		 }
 	],
