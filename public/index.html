@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cloudflare Tasks UI</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 24px;
+      background: #ffffff;
+      color: #000000;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    body[data-theme="dark"] {
+      background: #121212;
+      color: #ffffff;
+    }
+
+    h2 {
+      margin-bottom: 12px;
+    }
+
+    #tasks {
+      margin-top: 16px;
+    }
+
+    .task {
+      padding: 8px;
+      border: 1px solid #ddd;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    body[data-theme="dark"] .task {
+      border-color: #444;
+    }
+
+    button {
+      margin-left: 6px;
+      padding: 4px 8px;
+      cursor: pointer;
+    }
+
+    input {
+      padding: 6px;
+      width: 300px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Cloudflare Tasks</h2>
+
+  <div>
+    <input id="taskInput" placeholder="New task..." />
+    <button onclick="summarizeTask()">Summarize</button>
+    <button onclick="addTask()">Add</button>
+    <button onclick="toggleTheme()">Toggle Theme</button>
+  </div>
+
+  <div id="tasks"></div>
+
+<script>
+  const API = "/api";
+
+  /* ======================
+     TASKS
+     ====================== */
+
+  async function fetchTasks() {
+    const res = await fetch(`${API}/tasks`);
+    const data = await res.json();
+    renderTasks(data);
+  }
+
+  async function addTask() {
+    const title = document.getElementById("taskInput").value.trim();
+    if (!title) return;
+
+    await fetch(`${API}/tasks`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title })
+    });
+
+    document.getElementById("taskInput").value = "";
+    fetchTasks();
+  }
+
+  async function toggleTask(id, task) {
+    await fetch(`${API}/tasks/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: task.title,
+        completed: !task.completed
+      })
+    });
+
+    fetchTasks();
+  }
+
+  async function deleteTask(id) {
+    await fetch(`${API}/tasks/${id}`, { method: "DELETE" });
+    fetchTasks();
+  }
+
+  function renderTasks(tasks) {
+    const list = document.getElementById("tasks");
+    list.innerHTML = "";
+
+    tasks.forEach(task => {
+      const div = document.createElement("div");
+      div.className = "task";
+
+      const title = document.createElement("span");
+      title.innerHTML = task.completed
+        ? `<s>${task.title}</s>`
+        : task.title;
+
+      const actions = document.createElement("span");
+
+      const toggleBtn = document.createElement("button");
+      toggleBtn.textContent = "✔";
+      toggleBtn.onclick = () => toggleTask(task.id, task);
+
+      const deleteBtn = document.createElement("button");
+      deleteBtn.textContent = "🗑";
+      deleteBtn.onclick = () => deleteTask(task.id);
+
+      actions.appendChild(toggleBtn);
+      actions.appendChild(deleteBtn);
+
+      div.appendChild(title);
+      div.appendChild(actions);
+
+      list.appendChild(div);
+    });
+  }
+
+  /* ======================
+     AI SUMMARIZE
+     ====================== */
+
+  async function summarizeTask() {
+    const input = document.getElementById("taskInput").value.trim();
+    if (!input) return;
+
+    const res = await fetch(`${API}/summarize`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: input })
+    });
+
+    const data = await res.json();
+    document.getElementById("taskInput").value = data.summary;
+  }
+
+  /* ======================
+     THEME (KV)
+     ====================== */
+
+  async function loadTheme() {
+    const res = await fetch(`${API}/theme`);
+    const data = await res.json();
+    applyTheme(data.theme);
+  }
+
+  async function toggleTheme() {
+    const current = document.body.dataset.theme || "light";
+    const next = current === "light" ? "dark" : "light";
+
+    await fetch(`${API}/theme`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ theme: next })
+    });
+
+    applyTheme(next);
+  }
+
+  function applyTheme(theme) {
+    document.body.dataset.theme = theme;
+  }
+
+  /* ======================
+     INIT
+     ====================== */
+  fetchTasks();
+  loadTheme();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,48 @@
+/**
+ * https://developers.cloudflare.com/workers/wrangler/configuration/
+ */
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "cloudflare-task-app",
+	"main": "src/index.js",
+	"compatibility_date": "2025-02-01",
+	// =========================
+	// FRONTEND ASSETS (REQUIRED)
+	// =========================
+	"assets": {
+		"directory": "./public",
+		"binding": "ASSETS"
+	},
+	// =========================
+	// OBSERVABILITY
+	// =========================
+	"observability": {
+		"enabled": true
+	},
+	// =========================
+	// D1 DATABASE
+	// MUST MATCH env.DB IN CODE
+	// =========================
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "tasks_db",
+			"database_id": "4a184a72-3bd2-4342-b53e-6bb1d9eb6a89"
+		}
+	],
+    "kv_namespaces": [
+         {
+            "binding": "KVP",
+            "id": "b3b7b00d02704fec96eada20976d34f7"
+        }
+    ],
+
+	
+	// =========================
+	// WORKERS AI
+	// =========================
+	"ai": {
+		"binding": "AI"
+	}
+	// ⚠️ NO TRAILING COMMA
+}
