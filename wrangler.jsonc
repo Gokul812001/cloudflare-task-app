@@ -27,13 +27,13 @@
 		{
 			"binding": "DB",
 			"database_name": "tasks_db",
-			"database_id": "4a184a72-3bd2-4342-b53e-6bb1d9eb6a89"
+			"database_id": "0a2d90db-e600-4001-8441-7dcfb63675c9"
 		}
 	],
     "kv_namespaces": [
          {
             "binding": "KVP",
-            "id": "b3b7b00d02704fec96eada20976d34f7"
+            "id": "7d8d0d2310c9432b80a0f9149609b8b8"
         }
     ],
 
